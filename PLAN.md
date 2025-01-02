@@ -27,7 +27,7 @@ SupaSend is a comprehensive e-commerce and delivery platform designed specifical
   - API documentation
   - Testing and debugging
 
-- **Emmanuel Marshall (Frontend Developer)**
+- **Emanuel Marshal (Frontend Developer)**
   - Web application development
   - User interface implementation
   - Responsive design
