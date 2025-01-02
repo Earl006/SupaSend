@@ -1,0 +1,29 @@
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+
+### Register new user
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+    "name": "John Doe",
+    "email": "johndoe@yopmail.com",
+    "password": "pa$$w0rd",
+    "phoneNumber": "+25412345678",
+    "location": "Ndagani"
+}
+
+### Login user
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+    "email": "johndoe@yopmail.com",
+    "password": "pa$$w0rd"
+}
+
+### Google OAuth Login
+GET {{baseUrl}}/auth/google
+
+### Google OAuth Callback (for documentation only)
+GET {{baseUrl}}/auth/google/callback

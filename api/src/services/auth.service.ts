@@ -76,7 +76,7 @@ export class AuthService {
    * @param userId The user ID to encode in the token.
    * @returns A JWT token string.
    */
-  private static generateToken(userId: string): string {
+  public static generateToken(userId: string): string {
     return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
   }
 
