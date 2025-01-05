@@ -10,144 +10,415 @@ datasource db {
 }
 
 model User {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  phoneNumber String   @unique
-  password    String
-  role        UserRole @default(CUSTOMER)
-  location    String
-  avatarUrl   String    @default("https://static.vecteezy.com/system/resources/previews/005/545/335/non_2x/user-sign-icon-person-symbol-human-avatar-isolated-on-white-backogrund-vector.jpg")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  orders      Order[]
-  businesses  Business[] @relation("OwnerBusinesses")
+  id              String     @id @default(cuid())
+  name            String
+  email           String     @unique
+  password        String
+  salt            String
+  phoneNumber     String?    @unique
+  role            UserRole   @default(CUSTOMER)
+  avatarUrl       String     @default("https://static.vecteezy.com/system/resources/previews/005/545/335/non_2x/user-sign-icon-person-symbol-human-avatar-isolated-on-white-backogrund-vector.jpg")
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  deletedAt       DateTime?
+
+  admin           Admin?
+  business        Business?
+  customer        Customer?
+  shipper         Shipper?
+
+  wallet          Wallet?
+  resetTokens     PasswordResetToken[]
+  addresses       Address[]
+
+  @@map("Users")
 }
 
 enum UserRole {
-  CUSTOMER
-  BUSINESS_OWNER
   ADMIN
+  BUSINESS
+  CUSTOMER
+  SHIPPER
+}
+
+model Admin {
+  id             String     @id @default(cuid())
+  userId         String     @unique
+  level          Int
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  user           User       @relation(fields: [userId], references: [id])
+
+  @@map("Admins")
 }
 
 model Business {
-  id            String     @id @default(cuid())
-  name          String
-  ownerId       String
-  owner         User       @relation("OwnerBusinesses", fields: [ownerId], references: [id])
-  description   String?
-  location      String
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  products      Product[]
-  orders        Order[]    @relation("BusinessOrders")
+  id             String      @id @default(cuid())
+  ownerId        String      @unique
+  name           String
+  description    String?
+  rating         Float         @default(0.0)
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  deletedAt      DateTime?
+
+  owner          User        @relation(fields: [ownerId], references: [id])
+
+  products       Product[]
+  orders         BusinessOrder[]
+  orderItems     OrderItem[]
+  reviews        Review[]
+
+  @@map("Businesses")
+}
+
+model Customer {
+  id             String      @id @default(cuid())
+  userId         String      @unique
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  deletedAt      DateTime?
+
+  user           User        @relation(fields: [userId], references: [id])
+
+  carts          Cart[]
+  orders         Order[]
+  reviews        Review[]
+
+  @@map("Customers")
+}
+
+model Shipper {
+  id             String     @id @default(cuid())
+  userId         String     @unique
+  zoneId         String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  user           User       @relation(fields: [userId], references: [id])
+  zone           Zone     @relation(fields: [zoneId], references: [id])
+
+  deliveries     Delivery[]
+
+  @@map("Shippers")
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  name        String
-  description String?
-  price       Float
-  categoryId  String
-  category    Category @relation(fields: [categoryId], references: [id])
-  businessId  String
-  business    Business @relation(fields: [businessId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  orders      OrderItem[]
-}
+  id             String        @id @default(cuid())
+  name           String
+  description    String
+  price          Decimal
+  stockQuantity  Int
+  categoryId     String
+  businessId     String
+  imageUrl       String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
 
-model Order {
-  id          String      @id @default(cuid())
-  customerId  String
-  customer    User        @relation(fields: [customerId], references: [id])
-  businessId  String
-  business    Business    @relation("BusinessOrders", fields: [businessId], references: [id])
-  totalAmount Float
-  status      OrderStatus @default(PENDING)
-  paymentId   String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  items       OrderItem[]
-  payment     Payment?
-  delivery    Delivery?
-}
+  category       Category      @relation(fields: [categoryId], references: [id])
+  business       Business      @relation(fields: [businessId], references: [id])
 
-enum OrderStatus {
-  PENDING
-  DISPATCHED
-  DELIVERED
-  CANCELLED
-}
+  cartItems      CartItem[] 
+  orderItems     OrderItem[]
 
-model OrderItem {
-  id        String  @id @default(cuid())
-  orderId   String
-  order     Order   @relation(fields: [orderId], references: [id])
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
-  quantity  Int
-  price     Float
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Payment {
-  id        String   @id @default(cuid())
-  orderId   String   @unique
-  order     Order    @relation(fields: [orderId], references: [id])
-  amount    Float
-  method    PaymentMethod
-  status    PaymentStatus @default(PENDING)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-}
-
-enum PaymentMethod {
-  MPESA
-  BANK_TRANSFER
-}
-
-enum PaymentStatus {
-  PENDING
-  COMPLETED
-  FAILED
-}
-
-model Delivery {
-  id           String     @id @default(cuid())
-  orderId      String     @unique
-  order        Order      @relation(fields: [orderId], references: [id])
-  riderId      String?
-  rider        Rider?     @relation(fields: [riderId], references: [id])
-  status       DeliveryStatus @default(PENDING)
-  assignedAt   DateTime?
-  completedAt  DateTime?
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-}
-
-enum DeliveryStatus {
-  PENDING
-  IN_TRANSIT
-  DELIVERED
-  CANCELLED
-}
-
-model Rider {
-  id         String     @id @default(cuid())
-  name       String
-  phone      String     @unique
-  location   String
-  deliveries Delivery[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  @@map("Products")
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id             String       @id @default(cuid())
+  name           String
+  imageUrl       String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  products       Product[]
+
+  @@map("Categories")
+}
+
+model Cart {
+  id             String     @id @default(cuid())
+  customerId     String
+  total          Decimal    @default(0.00)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  customer       Customer   @relation(fields: [customerId], references: [id])
+
+  cartItems      CartItem[]
+
+  @@map("Carts")
+}
+
+model CartItem {
+  id            String      @id @default(cuid())
+  cartId        String
+  productId     String
+  quantity      Int         @default(1)
+  subtotal      Decimal     @default(0.00)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  cart          Cart        @relation(fields: [cartId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+
+  @@map("CartItems")
+}
+
+model Order {
+  id              String      @id @default(cuid())
+  customerId      String
+  totalPrice      Decimal     @default(0.00)
+  status          OrderStatus @default(PENDING)
+  isPaidInFull    Boolean     @default(false)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+
+  customer        Customer    @relation(fields: [customerId], references: [id])
+
+  orderItems      OrderItem[]
+  businessOrders  BusinessOrder[]
+  payments        Payment[]
+  deliveries      Delivery[]
+
+  @@map("Orders")
+}
+
+enum OrderStatus {
+  PENDING          // Order has been created but not yet processed
+  PROCESSING       // Order is being prepared (payment verified, items packed, etc.)
+  PARTIALLY_FULFILLED // Only some items in the order have been fulfilled
+  COMPLETED        // All items in the order have been delivered or fulfilled
+  CANCELED         // Order was canceled by the customer or the system
+  REFUNDED         // Payment refunded to the customer
+}
+
+model OrderItem {
+  id            String      @id @default(cuid())
+  orderId       String
+  productId     String
+  businessId    String
+  quantity      Int         @default(1)
+  subtotal      Decimal     @default(0.00)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  order         Order       @relation(fields: [orderId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+  business      Business    @relation(fields: [businessId], references: [id])
+
+  @@map("OrderItems")
+}
+
+model BusinessOrder {
+  id            String              @id @default(cuid())
+  orderId       String
+  businessId    String
+  subtotal      Decimal             @default(0.00)
+  status        BusinessOrderStatus @default(PENDING)
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  deletedAt     DateTime?
+
+  order         Order               @relation(fields: [orderId], references: [id])
+  business      Business            @relation(fields: [businessId], references: [id])
+
+  @@map("BusinessOrders")
+}
+
+enum BusinessOrderStatus {
+  PENDING            // Order from this business has been received but not yet processed
+  PROCESSING         // Business is preparing items for delivery
+  READY_FOR_PICKUP   // Items are ready for shipping or pickup by the shipper
+  SHIPPED            // Items have been shipped to the customer
+  DELIVERED          // Items have been successfully delivered to the customer
+  PARTIALLY_FULFILLED // Only some items from this business have been fulfilled
+  CANCELED           // Business-specific cancellation (e.g., out of stock)
+  REFUNDED           // Payment refunded for this business’s products
+}
+
+model Payment {
+  id               String         @id @default(cuid())
+  orderId          String
+  paymentMethodId  String
+  reference        String?
+  amount           Decimal
+  status           PaymentStatus  @default(PENDING)
+  isInstallment    Boolean        @default(false)
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  deletedAt        DateTime?
+
+  order            Order          @relation(fields: [orderId], references: [id])
+  paymentMethod    PaymentMethod  @relation(fields: [paymentMethodId], references: [id])
+
+  @@map("Payments")
+}
+
+enum PaymentStatus {
+  PENDING            // Payment initiated but not completed
+  PROCESSING         // Payment is being processed (e.g., bank verification)
+  PARTIALLY_PAID     // Payment made partially (for installments)
+  COMPLETED          // Payment successfully completed
+  FAILED             // Payment failed or was rejected
+  REFUNDED           // Payment refunded to the customer
+  CANCELED           // Payment canceled before processing
+}
+
+model PaymentMethod {
+  id           String      @id @default(cuid())
+  name         String      @unique                // e.g., MPesa, Bank Transfer, PayPal
+  isActive     Boolean     @default(true)         // Enable/Disable a payment method
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+
+  payments  Payment[]
+
+  @@map("PaymentMethods")
+}
+
+model Wallet {
+  id             String     @id @default(uuid())
+  userId         String     @unique
+  balance        Decimal    @default(0.00)
+  isActive       Boolean    @default(true)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  deletedAt      DateTime?
+
+  user           User       @relation(fields: [userId], references: [id])
+
+  transactions   Transaction[]
+
+  @@map("Wallets")
+}
+
+model Transaction {
+  id            String             @id @default(uuid())
+  walletId      String
+  type          TransactionType
+  reference     String?
+  amount        Decimal
+  status        TransactionStatus  @default(PENDING)
+  createdAt     DateTime           @default(now())
+  updatedAt     DateTime           @updatedAt
+  deletedAt     DateTime?
+
+  wallet         Wallet            @relation(fields: [walletId], references: [id])
+
+  @@map("Transactions")
+}
+
+enum TransactionType {
+  DEPOSIT        // Money added to the wallet
+  WITHDRAWAL     // Money withdrawn from the wallet
+  PAYMENT        // Payment for an order or service
+  REFUND         // Money refunded back to the wallet
+  TRANSFER       // Money transferred between wallets
+}
+
+enum TransactionStatus {
+  PENDING        // Transaction is awaiting processing
+  COMPLETED      // Transaction was successful
+  FAILED         // Transaction failed
+  CANCELED       // Transaction was canceled before completion
+  REVERSED       // Transaction was reversed (useful for refunds)
+}
+
+model Delivery {
+  id           String          @id @default(cuid())
+  orderId      String
+  shipperId    String
+  status       DeliveryStatus  @default(PENDING)
+  assignedAt   DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
+
+  order        Order           @relation(fields: [orderId], references: [id])
+  shipper      Shipper         @relation(fields: [shipperId], references: [id])
+
+  @@map("Deliveries")
+}
+
+enum DeliveryStatus {
+  PENDING            // Awaiting shipment or pickup
+  IN_TRANSIT         // Shipper has picked up the order and is en route
+  OUT_FOR_DELIVERY   // Order is out for final delivery
+  DELIVERED          // Order has been delivered to the customer
+  FAILED             // Delivery attempt failed (e.g., customer unavailable)
+  RETURNED           // Order returned to the business
+  CANCELED           // Delivery canceled before dispatch
+}
+
+model Zone {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  addresses   Address[]
+  shippers    Shipper[]
+
+  @@map("Zones")
+}
+
+model Address {
+  id              String   @id @default(uuid())
+  userId          String
+  zoneId          String
+  buildingName    String
+  streetName      String?
+  latitude        Float?
+  longitude       Float?
+  isPrimary       Boolean  @default(true)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  deletedAt       DateTime?
+
+  user            User     @relation(fields: [userId], references: [id])
+  zone            Zone     @relation(fields: [zoneId], references: [id])
+
+  @@map("Addresses")
+}
+
+model Review {
+  id            String      @id @default(uuid())
+  customerId    String
+  businessId    String
+  rating        Float
+  comment       String
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  deletedAt     DateTime?
+
+  customer      Customer    @relation(fields: [customerId], references: [id])
+  business      Business    @relation(fields: [businessId], references: [id])
+
+  @@map("Reviews")
+}
+
+model PasswordResetToken {
+  id            String     @id @default(uuid())
+  userId        String
+  code          String     // OTP or token code
+  isValid       Boolean    @default(true)
+  createdAt     DateTime   @default(now())
+  expiresAt     DateTime
+
+  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+
+  @@map("PasswordResetTokens")
 }
