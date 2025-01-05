@@ -410,7 +410,6 @@ model Review {
   @@map("Reviews")
 }
 
-
 model PasswordResetToken {
   id            String     @id @default(uuid())
   userId        String
