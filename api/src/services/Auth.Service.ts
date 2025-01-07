@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { PassportStatic } from 'passport';
 import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
-import { AuthResponse, LoginInput, RegisterInput } from '../interfaces/auth';
+import { AuthResponse, LoginInput, RegisterInput } from '../interfaces/Auth.Interface';
 
 // Initialize Prisma
 const prisma = new PrismaClient();

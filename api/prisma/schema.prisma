@@ -59,7 +59,7 @@ model Business {
   ownerId        String      @unique
   name           String
   description    String?
-  rating         Float         @default(0.0)
+  rating         Float       @default(0.0)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   deletedAt      DateTime?

@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import passport from 'passport';
-import { AuthController } from '../controllers/auth.controller';
+import { AuthController } from '../controllers/Auth.Controller';
 
 const router = Router();
 
 // Local auth routes
 router.post('/register', AuthController.register);
 router.post('/login', AuthController.login);
+router.post('/logout', AuthController.logout);
 
 // Google OAuth routes
 router.get('/google', 

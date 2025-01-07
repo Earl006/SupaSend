@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { AuthService } from '../services/auth.service';
-import { LoginInput, RegisterInput } from '../interfaces/auth';
+import { AuthService } from '../services/Auth.Service';
+import { LoginInput, RegisterInput } from '../interfaces/Auth.Interface';
 
 export class AuthController {
   static async register(req: Request, res: Response) {
@@ -35,6 +35,10 @@ export class AuthController {
         message: error instanceof Error ? error.message : 'Authentication failed'
       });
     }
+  }
+  
+  static async logout(req: Request, res: Response) {
+    
   }
 
   static googleLogin(req: Request, res: Response, next: NextFunction): void {
