@@ -10,27 +10,51 @@ class CartItemController {
     }
 
     getAllCartItems = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getCartItemById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     createCartItem = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     updateCartItem = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     deleteCartItem = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getCartItemsByCartId = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 }
 

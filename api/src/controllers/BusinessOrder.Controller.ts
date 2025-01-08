@@ -10,31 +10,59 @@ class BusinessOrderController {
     }
 
     getAllBusinessOrders = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getBusinessOrderById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     createBusinessOrder = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     updateBusinessOrder = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     deleteBusinessOrder = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getBusinessOrdersByOrderId = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     updateBusinessOrderStatus = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 }
 

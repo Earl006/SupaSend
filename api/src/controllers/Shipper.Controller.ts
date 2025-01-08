@@ -10,35 +10,67 @@ class ShipperController {
     }
 
     getAllShippers = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getShipperById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     createShipper = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     updateShipper = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     deleteShipper = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getShipperProfile = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     updateShipperProfile = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getShippersByZoneId = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 }
 
