@@ -10,31 +10,59 @@ class ProductController {
     }
 
     getAllProducts = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getProductById = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     createProduct = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     updateProduct = async (req: Request, res: Response, next: NextFunction) => {
+        try {
 
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     deleteProduct = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getProductsByBusiness = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     getProductsByCategory = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 }
 

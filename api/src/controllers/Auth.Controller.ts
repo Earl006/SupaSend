@@ -36,9 +36,13 @@ export class AuthController {
       });
     }
   }
-  
-  static async logout(req: Request, res: Response) {
-    
+
+  static async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+
+    } catch (error: unknown) {
+      next(error);
+    }
   }
 
   static googleLogin(req: Request, res: Response, next: NextFunction): void {

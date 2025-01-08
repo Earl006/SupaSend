@@ -10,15 +10,27 @@ class PasswordResetController {
     }
 
     requestPasswordResetCode = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     verifyPasswordResetCode = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 
     resetPassword = async (req: Request, res: Response, next: NextFunction) => {
-        
+        try {
+
+        } catch (error: unknown) {
+            next(error);
+        }
     }
 }
 
