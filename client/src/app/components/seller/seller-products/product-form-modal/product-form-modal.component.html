@@ -1,0 +1,134 @@
+<!-- Modal Backdrop -->
+<div *ngIf="show" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 flex items-center justify-center">
+  <!-- Modal Container -->
+  <div class="relative w-full max-w-4xl mx-4 bg-white dark:bg-gray-800 rounded-2xl shadow-2xl"
+       [class.animate-in]="show"
+       [class.slide-in-from-bottom]="show"
+       [class.zoom-in-95]="show"
+       [class.duration-300]="show">
+    
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-100 dark:border-gray-700">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Add New Product</h2>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Left Column - Image Upload -->
+        <div>
+          <div class="space-y-4">
+            <!-- Dropzone -->
+            <div
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+              [class.border-blue-500]="dragActive"
+              [class.bg-blue-50]="dragActive"
+              class="relative h-80 border-2 border-dashed rounded-xl transition-colors cursor-pointer hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30">
+              
+              <!-- Preview Image -->
+              <img *ngIf="previewImage"
+                   [src]="previewImage"
+                   class="absolute inset-0 w-full h-full object-contain p-4"
+                   alt="Product preview">
+              
+              <!-- Upload Prompt -->
+              <div *ngIf="!previewImage"
+                   class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 dark:text-gray-500">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <p class="text-sm mb-2">Drag and drop your product image here</p>
+                <p class="text-xs">or</p>
+                <label class="mt-2 px-4 py-2 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
+                  Browse Files
+                  <input type="file" (change)="onFileSelected($event)" class="hidden" accept="image/*">
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column - Product Details -->
+        <div class="space-y-6">
+          <!-- Product Name -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Product Name</label>
+            <input type="text"
+                   [(ngModel)]="product.name"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                   placeholder="Enter product name">
+          </div>
+
+          <!-- Category -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+            <select [(ngModel)]="product.category"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+              <option value="">Select Category</option>
+              <option *ngFor="let category of categories" [value]="category.id">{{category.name}}</option>
+            </select>
+          </div>
+
+          <!-- Price and Stock -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Price (KES)</label>
+              <input type="number"
+                     [(ngModel)]="product.price"
+                     min="0"
+                     class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                     placeholder="0.00">
+            </div>
+            <div class="space-y-2">
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Stock</label>
+              <input type="number"
+                     [(ngModel)]="product.stock"
+                     min="0"
+                     class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow"
+                     placeholder="0">
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            <textarea [(ngModel)]="product.description"
+                      rows="4"
+                      class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow resize-none"
+                      placeholder="Enter product description"></textarea>
+          </div>
+
+          <!-- Status -->
+          <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Status</label>
+            <select [(ngModel)]="product.status"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-shadow">
+              <option value="draft">Draft</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="flex justify-end space-x-4 p-6 border-t border-gray-100 dark:border-gray-700">
+      <button (click)="closeModal()"
+              class="px-6 py-3 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors">
+        Cancel
+      </button>
+      <button (click)="saveProduct()"
+              class="px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl hover:from-blue-600 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all">
+        Save Product
+      </button>
+    </div>
+  </div>
+</div>

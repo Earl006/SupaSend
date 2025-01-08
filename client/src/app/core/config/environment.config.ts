@@ -1,0 +1,6 @@
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api'
+} as const;
+
+export type Environment = typeof environment;
