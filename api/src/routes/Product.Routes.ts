@@ -8,7 +8,7 @@ router.post('/', ProductController.createProduct);
 router.get('/:id', ProductController.getProductById);
 router.put('/:id', ProductController.updateProduct);
 router.delete('/:id', ProductController.deleteProduct);
-router.get('/business/:businessId', ProductController.getProductsByBusiness);
-router.get('/category/:categoryId', ProductController.getProductsByCategory);
+router.get('/business/:businessId', ProductController.getProductsByBusinessId);
+router.get('/category/:categoryId', ProductController.getProductsByCategoryId);
 
 export default router;

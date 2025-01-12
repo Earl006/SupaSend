@@ -59,12 +59,15 @@ model Business {
   ownerId        String      @unique
   name           String
   description    String?
+  isApproved     Boolean     @default(false)
+  approvedById   String?
   rating         Float       @default(0.0)
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   deletedAt      DateTime?
 
   owner          User        @relation(fields: [ownerId], references: [id])
+  approvedBy     Admin?      @relation(fields: [approvedById], references: [id])
 
   products       Product[]
   orders         BusinessOrder[]
