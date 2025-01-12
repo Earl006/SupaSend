@@ -4,7 +4,7 @@ import ReviewController from '../controllers/Review.Controller';
 const router = Router();
 
 router.get('/', ReviewController.getAllReviews);
-router.post('/', ReviewController.createReview);
+router.post('/:businessId', ReviewController.createReview);
 router.get('/:id', ReviewController.getReviewById);
 router.put('/:id', ReviewController.updateReview);
 router.delete('/:id', ReviewController.deleteReview);

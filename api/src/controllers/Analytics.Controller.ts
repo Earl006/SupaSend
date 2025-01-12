@@ -11,7 +11,8 @@ class AnalyticsController {
 
     getAdminAddressAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminAddressAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -19,7 +20,8 @@ class AnalyticsController {
 
     getAdminAdminAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminAdminAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -27,7 +29,8 @@ class AnalyticsController {
 
     getAdminBusinessAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminBusinessAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -35,7 +38,8 @@ class AnalyticsController {
 
     getAdminBusinessOrderAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminBusinessOrderAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -43,7 +47,8 @@ class AnalyticsController {
 
     getAdminCartAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminCartAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -51,7 +56,8 @@ class AnalyticsController {
 
     getAdminCartItemAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminCartItemAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -59,7 +65,8 @@ class AnalyticsController {
 
     getAdminCategoryAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminCategoryAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -67,7 +74,8 @@ class AnalyticsController {
 
     getAdminCustomerAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminCustomerAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -75,7 +83,8 @@ class AnalyticsController {
 
     getAdminDeliveryAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminDeliveryAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -83,7 +92,8 @@ class AnalyticsController {
 
     getAdminOrderAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminOrderAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -91,7 +101,8 @@ class AnalyticsController {
 
     getAdminOrderItemAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminOrderItemAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -99,7 +110,8 @@ class AnalyticsController {
 
     getAdminPaymentAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminPaymentAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -107,7 +119,8 @@ class AnalyticsController {
 
     getAdminPaymentMethodAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminPaymentMethodAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -115,7 +128,8 @@ class AnalyticsController {
 
     getAdminProductAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminProductAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -123,7 +137,8 @@ class AnalyticsController {
 
     getAdminReviewAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminReviewAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -131,7 +146,8 @@ class AnalyticsController {
 
     getAdminShipperAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminShipperAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -139,7 +155,8 @@ class AnalyticsController {
 
     getAdminTransactionAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminTransactionAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -147,7 +164,8 @@ class AnalyticsController {
 
     getAdminWalletAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminWalletAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -155,7 +173,8 @@ class AnalyticsController {
 
     getAdminZoneAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminZoneAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -163,7 +182,8 @@ class AnalyticsController {
 
     getAdminUserAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getAdminUserAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -171,7 +191,8 @@ class AnalyticsController {
 
     getBusinessBusinessOrderAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getBusinessBusinessOrderAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -179,7 +200,8 @@ class AnalyticsController {
 
     getBusinessOrderItemAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getBusinessOrderItemAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -187,7 +209,8 @@ class AnalyticsController {
 
     getBusinessProductAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getBusinessProductAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -195,7 +218,8 @@ class AnalyticsController {
 
     getBusinessReviewAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getBusinessReviewAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -203,7 +227,8 @@ class AnalyticsController {
 
     getBusinessTransactionAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getBusinessTransactionAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -211,7 +236,8 @@ class AnalyticsController {
 
     getBusinessWalletAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getBusinessWalletAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -219,7 +245,8 @@ class AnalyticsController {
 
     getCustomerCartAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerCartAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -227,7 +254,8 @@ class AnalyticsController {
 
     getCustomerCartItemAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerCartItemAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -235,7 +263,8 @@ class AnalyticsController {
 
     getCustomerOrderAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerOrderAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -243,7 +272,8 @@ class AnalyticsController {
 
     getCustomerOrderItemAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerOrderItemAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -251,7 +281,8 @@ class AnalyticsController {
 
     getCustomerPaymentAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerPaymentAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -259,7 +290,8 @@ class AnalyticsController {
 
     getCustomerReviewAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerReviewAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -267,7 +299,8 @@ class AnalyticsController {
 
     getCustomerTransactionAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerTransactionAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -275,7 +308,8 @@ class AnalyticsController {
 
     getCustomerWalletAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getCustomerWalletAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -283,7 +317,8 @@ class AnalyticsController {
 
     getShipperDeliveryAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getShipperDeliveryAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -291,7 +326,8 @@ class AnalyticsController {
 
     getShipperTransactionAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getShipperTransactionAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }
@@ -299,7 +335,8 @@ class AnalyticsController {
 
     getShipperWalletAnalytics = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const analyticsData = await this.analyticsService.getShipperWalletAnalytics();
+            res.status(200).json(analyticsData);
         } catch (error: unknown) {
             next(error);
         }

@@ -11,7 +11,8 @@ class PaymentMethodController {
 
     getAllPaymentMethods = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const paymentMethods = await this.paymentMethodService.getAllPaymentMethods();
+            res.status(200).json(paymentMethods);
         } catch (error: unknown) {
             next(error);
         }
@@ -19,7 +20,9 @@ class PaymentMethodController {
 
     getPaymentMethodById = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const paymentMethodId = req.params.id;
+            const paymentMethod = await this.paymentMethodService.getPaymentMethodById(paymentMethodId);
+            res.status(200).json(paymentMethod);
         } catch (error: unknown) {
             next(error);
         }
@@ -27,7 +30,8 @@ class PaymentMethodController {
 
     createPaymentMethod = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const newPaymentMethod = await this.paymentMethodService.createPaymentMethod(req.body);
+            res.status(201).json(newPaymentMethod);
         } catch (error: unknown) {
             next(error);
         }
@@ -35,7 +39,9 @@ class PaymentMethodController {
 
     updatePaymentMethod = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const paymentMethodId = req.params.id;
+            const updatedPaymentMethod = await this.paymentMethodService.updatePaymentMethod(paymentMethodId, req.body);
+            res.status(200).json(updatedPaymentMethod);
         } catch (error: unknown) {
             next(error);
         }
@@ -43,7 +49,9 @@ class PaymentMethodController {
 
     deletePaymentMethod = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const paymentMethodId = req.params.id;
+            await this.paymentMethodService.deletePaymentMethod(paymentMethodId);
+            res.status(204).send();
         } catch (error: unknown) {
             next(error);
         }
@@ -51,7 +59,9 @@ class PaymentMethodController {
 
     activatePaymentMethod = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const paymentMethodId = req.params.id;
+            await this.paymentMethodService.activatePaymentMethod(paymentMethodId);
+            res.status(204).send();
         } catch (error: unknown) {
             next(error);
         }
@@ -59,7 +69,9 @@ class PaymentMethodController {
 
     deactivatePaymentMethod = async (req: Request, res: Response, next: NextFunction) => {
         try {
-
+            const paymentMethodId = req.params.id;
+            await this.paymentMethodService.deactivatePaymentMethod(paymentMethodId);
+            res.status(204).send();
         } catch (error: unknown) {
             next(error);
         }
