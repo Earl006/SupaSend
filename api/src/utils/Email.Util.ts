@@ -2,48 +2,51 @@ import nodemailer, { Transporter } from 'nodemailer';
 import ejs from 'ejs';
 import path from 'path';
 import { EmailOptions } from '../interfaces/EmailOptions.Interface';
+import logger from './Logger.Util';
 
 const sendMail = async (options: EmailOptions): Promise<void> => {
-  try {
-    console.log('Creating transport...');
-    const transporter: Transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST,
-      port: parseInt(process.env.EMAIL_PORT || '587'),
-      secure: true, // true for port 465, false for other ports
-      auth: {
-        user: process.env.EMAIL_NAME,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-      socketTimeout: 30000, // 30 seconds
-      connectionTimeout: 30000, // 30 seconds
-    });
+	try {
+		// Configure the transporter
+		const transporter: Transporter = nodemailer.createTransport({
+			host: process.env.EMAIL_HOST,
+			port: parseInt(process.env.EMAIL_PORT || '587'),
+			secure: parseInt(process.env.EMAIL_PORT || '587') === 465, // Use secure for port 465
+			auth: {
+				user: process.env.EMAIL_NAME,
+				pass: process.env.EMAIL_PASSWORD,
+			},
+			tls: {
+				rejectUnauthorized: false,
+			},
+			socketTimeout: 30000,
+			connectionTimeout: 30000,
+		});
 
-    console.log('Transport created successfully');
+		// Destructure options
+		const { email, subject, template, body, attachments } = options;
 
-    const { email, subject, template, body, attachments } = options;
-    console.log('Rendering email template...');
-    const html: string = await ejs.renderFile(template, body);
+		// Resolve the template file path
+		const templatePath = path.resolve(__dirname, '../views/emails', template);
 
-    console.log('Email template rendered successfully');
+		// Render the email template with provided data
+		const html: string = await ejs.renderFile(templatePath, body);
 
-    const mailOptions = {
-      from: process.env.EMAIL_NAME,
-      to: email,
-      subject,
-      html,
-      attachments, // Add attachments to the mail options
-    };
+		// Email options
+		const mailOptions = {
+			from: process.env.EMAIL_NAME,
+			to: email,
+			subject,
+			html,
+			attachments,
+		};
 
-    console.log('Sending email to:', email);
-    const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', result);
-  } catch (error: any) {
-    console.error('Error sending email:', error.message || error);
-    throw new Error('Failed to send email. Please try again later.');
-  }
+		// Send the email
+		const result = await transporter.sendMail(mailOptions);
+	} catch (error: any) {
+		// Log the error with appropriate level
+		logger.error(`Error sending email to ${options.email}: ${error.message}`, { error });
+		throw new Error('An error occurred while sending the email. Please try again later.');
+	}
 };
 
 export default sendMail;

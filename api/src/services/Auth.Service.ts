@@ -1,138 +1,184 @@
-import { PrismaClient, User } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { PassportStatic } from 'passport';
-import { Strategy as GoogleStrategy, Profile } from 'passport-google-oauth20';
-import { AuthResponse, LoginInput, RegisterInput } from '../interfaces/Auth.Interface';
+import createError from 'http-errors';
+import { OAuth2Client } from 'google-auth-library';
+import prisma from '../config/Prisma.Config';
 
-// Initialize Prisma
-const prisma = new PrismaClient();
+class AuthService {
 
-// Environment variables
-const JWT_SECRET = process.env.JWT_SECRET as string;
-const JWT_EXPIRY = process.env.JWT_EXPIRY || '7d';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID as string;
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET as string;
-const BASE_URL = process.env.BASE_URL || 'http://localhost:3000';
+	private googleClient: OAuth2Client;
 
+	constructor() {
+		this.googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+	}
 
-export class AuthService {
-  /**
-   * Registers a new user.
-   * @param data RegisterInput object containing user details.
-   * @returns AuthResponse with user and JWT token.
-   */
-  static async register(data: RegisterInput): Promise<AuthResponse> {
-    const { name, email, phoneNumber, password, location } = data;
+	addDurationToDate(duration: string): Date {
+		const match = duration.match(/^(\d+)([a-zA-Z]+)$/);
+		if (!match) {
+			throw createError(500, "Invalid duration format in environment variable. Expected a value like '7d', '1h', etc.");
+		}
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
-      throw new Error('Email is already in use.');
-    }
+		const [, value, unit] = match;
+		const amount = parseInt(value, 10);
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+		let now = new Date();
 
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        phoneNumber,
-        password: hashedPassword,
-        location,
-        
-      },
-    });
+		switch (unit) {
+			case 'd':
+				now.setDate(now.getDate() + amount);
+				break;
+			case 'h':
+				now.setHours(now.getHours() + amount);
+				break;
+			case 'm':
+				now.setMinutes(now.getMinutes() + amount);
+				break;
+			case 's':
+				now.setSeconds(now.getSeconds() + amount);
+				break;
+			default:
+				throw createError(500, `Unsupported time unit in environment variable: ${unit}. Supported units: 'd', 'h', 'm', 's'.`);
+		}
 
-    const token = this.generateToken(user.id);
+		return now;
+	}
 
-    return { user, token };
-  }
+	generateAccessToken(user: any): string {
+		const payload = { userId: user.id, role: user.role };
+		return jwt.sign(payload, process.env.JWT_SECRET as string, { expiresIn: process.env.JWT_EXPIRY as string });
+	}
 
-  /**
-   * Logs in a user.
-   * @param data LoginInput object containing email and password.
-   * @returns AuthResponse with user and JWT token.
-   */
-  static async login(data: LoginInput): Promise<AuthResponse> {
-    const { email, password } = data;
+	generateRefreshToken(user: any): string {
+		const payload = { userId: user.id, role: user.role };
+		return jwt.sign(payload, process.env.REFRESH_TOKEN_SECRET as string, { expiresIn: process.env.REFRESH_TOKEN_EXPIRY as string });
+	}
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user) {
-      throw new Error('Invalid email or password.');
-    }
+	async hashPassword(password: string): Promise<{ hash: string; salt: string }> {
+		// const saltRounds = process.env.SALT_ROUNDS ? parseInt(process.env.SALT_ROUNDS, 10) : 10;
+		// const salt = bcrypt.genSaltSync(saltRounds);
+		const salt = bcrypt.genSaltSync(10);
+		const hash = bcrypt.hashSync(password, salt);
+		return { hash, salt };
+	}
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (!isPasswordValid) {
-      throw new Error('Invalid email or password.');
-    }
+	async validatePassword(password: string, hash: string): Promise<boolean> {
+		return bcrypt.compareSync(password, hash);
+	}
 
-    const token = this.generateToken(user.id);
+	async findUserByEmail(email: string) {
+		return await prisma.user.findUnique({
+			where: { email, deletedAt: null }
+		});
+	}
 
-    return { user, token };
-  }
+	async findUserByID(id: string) {
+		const user = await prisma.user.findUnique({
+			where: { id, deletedAt: null }
+		});
 
-  /**
-   * Generates a JWT token.
-   * @param userId The user ID to encode in the token.
-   * @returns A JWT token string.
-   */
-  public static generateToken(userId: string): string {
-    return jwt.sign({ id: userId }, JWT_SECRET, { expiresIn: JWT_EXPIRY });
-  }
+		if (!user) throw createError(404, 'User not found');
+		return user;
+	}
 
-  /**
-   * Sets up Passport strategies for SSO authentication.
-   * @param passport Passport instance.
-   */
-  static setupSSO(passport: PassportStatic): void {
-    passport.use(
-      new GoogleStrategy(
-        {
-          clientID: GOOGLE_CLIENT_ID,
-          clientSecret: GOOGLE_CLIENT_SECRET,
-          callbackURL: `${BASE_URL}/auth/google/callback`,
-        },
-        async (accessToken, refreshToken, profile: Profile, done) => {
-          try {
-            const email = profile.emails?.[0]?.value;
-            if (!email) {
-              return done(new Error('Email not available from Google profile'), false);
-            }
+	async saveRefreshToken(userId: string, refreshToken: string): Promise<void> {
+		const expiresAt = this.addDurationToDate(process.env.REFRESH_TOKEN_EXPIRY as string);
 
-            let user = await prisma.user.findUnique({ where: { email } });
+		await prisma.refreshToken.create({
+			data: { userId, token: refreshToken, expiresAt },
+		});
+	}
 
-            if (!user) {
-              user = await prisma.user.create({
-                data: {
-                  name: profile.displayName || 'Unnamed User',
-                  email,
-                  avatarUrl: profile.photos?.[0]?.value || '',
-                  password: '', // No password for SSO users
-                  location: '', // Default location
-                  phoneNumber: '', // Default phone number for SSO users
-                },
-              });
-            }
+	async validateRefreshToken(refreshToken: string): Promise<any> {
+		try {
+			return jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string);
+		} catch (error) {
+			throw createError(401, 'Invalid refresh token');
+		}
+	}
 
-            return done(null, user);
-          } catch (err) {
-            return done(err, false);
-          }
-        }
-      )
-    );
+	async revokeRefreshToken(refreshToken: string): Promise<void> {
+		await prisma.refreshToken.deleteMany({
+			where: { token: refreshToken },
+		});
+	}
 
-    passport.serializeUser((user: any, done) => {
-      done(null, user.id);
-    });
+	async register(name: string, email: string, password: string) {
+		const existingUser = await this.findUserByEmail(email);
+		if (existingUser) throw createError(400, 'Email is already registered.');
 
-    passport.deserializeUser(async (id: string, done) => {
-      try {
-        const user = await prisma.user.findUnique({ where: { id } });
-        done(null, user);
-      } catch (err) {
-        done(err, null);
-      }
-    });
-  }
+		const { hash, salt } = await this.hashPassword(password);
+
+		const user = await prisma.user.create({
+			data: {
+				name,
+				email,
+				password: hash,
+				salt,
+				role: 'CUSTOMER',
+				customer: { create: {} },
+			},
+		});
+
+		const token = this.generateAccessToken(user);
+		return { user, token };
+	}
+
+	async login(email: string, password: string) {
+		const user = await this.findUserByEmail(email);
+		if (!user || !user.password) throw createError(401, 'Invalid email or password.');
+
+		const isPasswordValid = await this.validatePassword(password, user.password);
+		if (!isPasswordValid) throw createError(401, 'Invalid email or password.');
+
+		const token = this.generateAccessToken(user);
+		return { user, token };
+	}
+
+	async googleLogin(): Promise<string> {
+		const authUrl = this.googleClient.generateAuthUrl({
+			access_type: 'offline',
+			scope: ['profile', 'email', 'https://www.googleapis.com/auth/userinfo.profile', 'https://www.googleapis.com/auth/userinfo.email'],
+		});
+		return authUrl;
+	}
+
+	async googleCallback(idToken: string): Promise<{ user: any; token: string }> {
+		const ticket = await this.googleClient.verifyIdToken({
+			idToken,
+			audience: process.env.GOOGLE_CLIENT_ID,
+		});
+		const payload = ticket.getPayload();
+
+		if (!payload || !payload.email) throw createError(400, 'Invalid Google token.');
+
+		let user = await this.findUserByEmail(payload.email);
+
+		if (!user) {
+			user = await prisma.user.create({
+				data: {
+					name: payload.name || 'Unknown User',
+					email: payload.email,
+					avatarUrl: payload.picture,
+					password: '',
+					salt: '',
+					role: 'CUSTOMER',
+					customer: { create: {} },
+				},
+			});
+		} else {
+			// Update user data if it has changed.
+			user = await prisma.user.update({
+				where: { id: user.id },
+				data: {
+					name: payload.name || user.name,
+					avatarUrl: payload.picture || user.avatarUrl,
+				},
+			});
+		}
+
+		const token = this.generateAccessToken(user);
+		return { user, token };
+	}
 }
+
+export default AuthService;

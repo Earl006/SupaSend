@@ -1,72 +1,110 @@
-import { NextFunction, Request, Response } from 'express';
-import { AuthService } from '../services/Auth.Service';
-import { LoginInput, RegisterInput } from '../interfaces/Auth.Interface';
+import { Request, Response, NextFunction } from 'express';
+import createError from 'http-errors';
+import AuthService from '../services/Auth.Service';
 
-export class AuthController {
-  static async register(req: Request, res: Response) {
-    try {
-      const data: RegisterInput = req.body;
-      const response = await AuthService.register(data);
-      res.status(201).json({
-        success: true,
-        message: 'User registered successfully',
-        data: response
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Registration failed'
-      });
-    }
-  }
+class AuthController {
+	private authService: AuthService;
 
-  static async login(req: Request, res: Response) {
-    try {
-      const data: LoginInput = req.body;
-      const response = await AuthService.login(data);
-      res.status(200).json({
-        success: true,
-        message: 'Login successful',
-        data: response
-      });
-    } catch (error) {
-      res.status(401).json({
-        success: false,
-        message: error instanceof Error ? error.message : 'Authentication failed'
-      });
-    }
-  }
+	constructor() {
+		this.authService = new AuthService();
+	}
 
-  static async logout(req: Request, res: Response, next: NextFunction) {
-    try {
+	register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const { name, email, password } = req.body;
+			const { user, token } = await this.authService.register(name, email, password);
+			const refreshToken = this.authService.generateRefreshToken(user);
+			await this.authService.saveRefreshToken(user.id, refreshToken);
 
-    } catch (error: unknown) {
-      next(error);
-    }
-  }
+			res
+				.status(201)
+				.cookie('accessToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+				.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/auth/refresh-token' })
+				.json({ message: 'Registration successful', user });
+		} catch (error: unknown) {
+			next(error);
+		}
+	};
 
-  static googleLogin(req: Request, res: Response, next: NextFunction): void {
-    try {
-      next();
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        message: 'Google authentication failed'
-      });
-    }
-  }
+	login = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const { email, password } = req.body;
+			const { user, token } = await this.authService.login(email, password);
+			const refreshToken = this.authService.generateRefreshToken(user);
+			await this.authService.saveRefreshToken(user.id, refreshToken);
 
-  static googleCallback(req: Request, res: Response, next: NextFunction): void {
-    try {
-      if (!req.user) {
-        throw new Error('Authentication failed');
-      }
-      const user = req.user as { id: string };
-      const token = AuthService.generateToken(user.id);
-      const redirectUrl = `${process.env.FRONTEND_URL}/dashboard?token=${token}`;
-      res.redirect(redirectUrl);
-    } catch (error) {
-      res.redirect(`${process.env.FRONTEND_URL}/login?error=authentication_failed`);
-    }
-  }
+			res
+				.status(200)
+				.cookie('accessToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+				.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/auth/refresh-token' })
+				.json({ message: 'Login successful', user });
+		} catch (error: unknown) {
+			next(error);
+		}
+	};
+
+	logout = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const { refreshToken } = req.cookies;
+
+			if (refreshToken) {
+				await this.authService.revokeRefreshToken(refreshToken);
+			}
+
+			res
+				.status(200)
+				.clearCookie('accessToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+				.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+				.json({ message: 'Logout successful' });
+		} catch (error: unknown) {
+			next(error);
+		}
+	};
+
+	googleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const authUrl = await this.authService.googleLogin();
+			res.status(200).json({ authUrl });
+		} catch (error: unknown) {
+			next(error);
+		}
+	};
+
+	googleCallback = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const { idToken } = req.body;
+			const { user, token } = await this.authService.googleCallback(idToken);
+			const refreshToken = this.authService.generateRefreshToken(user);
+
+			res
+				.status(200)
+				.cookie('accessToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+				.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/auth/refresh-token' })
+				.json({ message: 'Google login successful', user });
+		} catch (error: unknown) {
+			next(error);
+		}
+	};
+
+	refreshToken = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+		try {
+			const { refreshToken } = req.cookies;
+
+			if (!refreshToken) throw createError(401, 'Refresh token missing');
+
+			const decoded = await this.authService.validateRefreshToken(refreshToken);
+
+			const user = await this.authService.findUserByID(decoded.userId);
+			const newAccessToken = this.authService.generateAccessToken(user);
+
+			res
+				.status(200)
+				.cookie('accessToken', newAccessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
+				.json({ message: 'Access token refreshed' });
+		} catch (error: unknown) {
+			next(error);
+		}
+	};
 }
+
+export default new AuthController();

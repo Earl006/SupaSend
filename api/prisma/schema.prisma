@@ -51,6 +51,8 @@ model Admin {
 
   user           User       @relation(fields: [userId], references: [id])
 
+  business       Business[]
+
   @@map("Admins")
 }
 
@@ -414,14 +416,23 @@ model Review {
 }
 
 model PasswordResetToken {
-  id            String     @id @default(uuid())
-  userId        String
-  code          String     // OTP or token code
-  isValid       Boolean    @default(true)
-  createdAt     DateTime   @default(now())
-  expiresAt     DateTime
+  id          String   @id @default(cuid())
+  userId      String
+  token       String
+  salt        String
+  isValid     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
 
-  user          User       @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 
   @@map("PasswordResetTokens")
+}
+
+model RefreshToken {
+	id        String   @id @default(cuid())
+	userId    String
+	token     String   @unique
+	createdAt DateTime @default(now())
+	expiresAt DateTime
 }

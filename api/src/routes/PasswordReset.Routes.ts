@@ -3,8 +3,7 @@ import PasswordResetController from '../controllers/PasswordReset.Controller';
 
 const router = Router();
 
-router.post('/', PasswordResetController.requestPasswordResetCode);
-router.post('/verify', PasswordResetController.verifyPasswordResetCode);
-router.post('/reset', PasswordResetController.resetPassword);
+router.post('/forgot-password', PasswordResetController.requestPasswordReset);
+router.post('/reset-password', PasswordResetController.resetPassword);
 
 export default router;
