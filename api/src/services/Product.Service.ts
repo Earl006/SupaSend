@@ -8,15 +8,6 @@ class ProductService {
     async getProductById(productId: string) {
         throw new Error('Method not implemented.');
     }
-    async createProduct(userId: string, body: any) {
-        throw new Error('Method not implemented.');
-    }
-    async updateProduct(productId: string, body: any) {
-        throw new Error('Method not implemented.');
-    }
-    async deleteProduct(productId: string) {
-        throw new Error('Method not implemented.');
-    }
     async getProductsByBusinessId(businessId: string) {
         throw new Error('Method not implemented.');
     }

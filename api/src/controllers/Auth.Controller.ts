@@ -20,7 +20,11 @@ class AuthController {
 				.status(201)
 				.cookie('accessToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
 				.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/auth/refresh-token' })
-				.json({ message: 'Registration successful', user });
+				.json({
+					success: true,
+					message: 'Registration successful.',
+					data: user,
+				});
 		} catch (error: unknown) {
 			next(error);
 		}
@@ -37,7 +41,11 @@ class AuthController {
 				.status(200)
 				.cookie('accessToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
 				.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/auth/refresh-token' })
-				.json({ message: 'Login successful', user });
+				.json({
+					success: true,
+					message: 'Login successful.',
+					data: user,
+				});
 		} catch (error: unknown) {
 			next(error);
 		}
@@ -55,7 +63,10 @@ class AuthController {
 				.status(200)
 				.clearCookie('accessToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
 				.clearCookie('refreshToken', { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
-				.json({ message: 'Logout successful' });
+				.json({
+					success: true,
+					message: 'Logout successful.',
+				});
 		} catch (error: unknown) {
 			next(error);
 		}
@@ -64,7 +75,11 @@ class AuthController {
 	googleLogin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
 		try {
 			const authUrl = await this.authService.googleLogin();
-			res.status(200).json({ authUrl });
+			res.status(200).json({
+				success: true,
+				message: 'Google login URL generated successfully.',
+				data: authUrl,
+			});
 		} catch (error: unknown) {
 			next(error);
 		}
@@ -80,7 +95,11 @@ class AuthController {
 				.status(200)
 				.cookie('accessToken', token, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
 				.cookie('refreshToken', refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production', path: '/auth/refresh-token' })
-				.json({ message: 'Google login successful', user });
+				.json({
+					success: true,
+					message: 'Google login successful.',
+					data: user,
+				});
 		} catch (error: unknown) {
 			next(error);
 		}
@@ -100,7 +119,10 @@ class AuthController {
 			res
 				.status(200)
 				.cookie('accessToken', newAccessToken, { httpOnly: true, secure: process.env.NODE_ENV === 'production' })
-				.json({ message: 'Access token refreshed' });
+				.json({
+					success: true,
+					message: 'Access token refreshed successfully.',
+				});
 		} catch (error: unknown) {
 			next(error);
 		}

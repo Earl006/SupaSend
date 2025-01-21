@@ -15,7 +15,8 @@ class PasswordResetController {
             await this.passwordResetService.generateResetToken(email);
 
             res.status(200).json({
-                message: 'Password reset link has been sent to your email if the account exists.',
+                success: true,
+                message: 'Password reset link has been sent to your email if the account exists.'
             });
         } catch (error: unknown) {
             next(error);
@@ -24,10 +25,24 @@ class PasswordResetController {
 
     resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
         try {
-            const { token, newPassword } = req.body;
-            await this.passwordResetService.resetPassword(token, newPassword);
+            const { token } = req.query;
+            const { newPassword } = req.body;
 
-            res.status(200).json({ message: 'Password has been reset successfully.' });
+            if (!token || !newPassword) {
+                res.status(400).json({
+                    success: false,
+                    message: 'Token and new password are required.'
+                });
+
+                return;
+            }
+
+            await this.passwordResetService.resetPassword(token as string, newPassword);
+
+            res.status(200).json({
+                success: true,
+                message: 'Password has been reset successfully.'
+            });
         } catch (error: unknown) {
             next(error);
         }

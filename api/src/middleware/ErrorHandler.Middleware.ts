@@ -19,7 +19,8 @@ const errorHandler = (err: HttpError, req: Request, res: Response, next: NextFun
 
     // Send formatted error response
     res.status(statusCode).json({
-        status: 'error',
+        success: false,
+        // status: 'error',
         statusCode,
         message,
         code: err.name || 'INTERNAL_SERVER_ERROR'

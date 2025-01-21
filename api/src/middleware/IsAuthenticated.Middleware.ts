@@ -3,11 +3,11 @@ import jwt from 'jsonwebtoken';
 import createError from 'http-errors';
 import { UserRole } from '../interfaces/User.Interface';
 
-const IsAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+const IsAuthenticated = (req: Request, res: Response, next: NextFunction): void => {
     const token = req.cookies?.accessToken || req.headers.authorization?.split(' ')[1];
 
     if (!token) {
-        return res.status(401).json({ message: 'Authentication token is missing.' });
+        return next(createError(401, 'Authentication token is missing.'));
     }
 
     try {

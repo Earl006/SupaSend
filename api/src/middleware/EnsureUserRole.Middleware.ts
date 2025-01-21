@@ -1,14 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
+import createError from 'http-errors';
 import { UserRole } from '../interfaces/User.Interface';
 
-const EnsureUserRole = (role: UserRole) => {
-    return (req: Request, res: Response, next: NextFunction) => {
+const EnsureUserRole = (roles: UserRole | UserRole[]) => {
+    const allowedRoles = Array.isArray(roles) ? roles.map((role) => role.toUpperCase()) : [roles.toUpperCase()];
+
+    return (req: Request, res: Response, next: NextFunction): void => {
         if (!req.user) {
-            return res.status(401).json({ message: 'Unauthorized access: User is not authenticated.' });
+            return next(createError(401, 'Unauthorized access: User is not authenticated.'));
         }
 
-        if (req.user?.role !== role) {
-            return res.status(403).json({ message: `Access forbidden: Requires ${role} role.` });
+        const userRole = req.user.role.toUpperCase();
+
+        if (!allowedRoles.includes(userRole)) {
+            return next(createError(403, 'Access forbidden: Insufficient permissions.'));
         }
 
         next();

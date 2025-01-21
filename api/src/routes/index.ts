@@ -1,53 +1,38 @@
-import express from 'express';
-import AddressRoutes from './Address.Routes';
-import AdminRoutes from './Admin.Routes';
-import AnalyticsRoutes from './Analytics.Routes';
-import AuthRoutes from './Auth.Routes';
-import BusinessRoutes from './Business.Routes';
-import BusinessOrderRoutes from './BusinessOrder.Routes';
-import CartRoutes from './Cart.Routes';
-import CartItemRoutes from './CartItem.Routes';
-import CategoryRoutes from './Category.Routes';
-import CustomerRoutes from './Customer.Routes';
-import DeliveryRoutes from './Delivery.Routes';
-import OrderRoutes from './Order.Routes';
-import OrderItemRoutes from './OrderItem.Routes';
-import PasswordResetRoutes from './PasswordReset.Routes';
-import PaymentRoutes from './Payment.Routes';
-import PaymentMethodRoutes from './PaymentMethod.Routes';
-import ProductRoutes from './Product.Routes';
-import ReviewRoutes from './Review.Routes';
-import ShipperRoutes from './Shipper.Routes';
-import TransactionRoutes from './Transaction.Routes';
-import UserRoutes from './User.Routes';
-import WalletRoutes from './Wallet.Routes';
-import ZoneRoutes from './Zone.Routes';
+import { Router } from 'express';
+import fs from 'fs';
+import path from 'path';
 
-const router = express.Router();
+const router = Router();
 
-// Mount routes
-router.use('/addresses', AddressRoutes);
-router.use('/admins', AdminRoutes);
-router.use('/analytics', AnalyticsRoutes);
-router.use('/auth', AuthRoutes);
-router.use('/businesses', BusinessRoutes);
-router.use('/business-orders', BusinessOrderRoutes);
-router.use('/carts', CartRoutes);
-router.use('/cart-items', CartItemRoutes);
-router.use('/categories', CategoryRoutes);
-router.use('/customers', CustomerRoutes);
-router.use('/deliveries', DeliveryRoutes);
-router.use('/orders', OrderRoutes);
-router.use('/order-items', OrderItemRoutes);
-router.use('/password-reset', PasswordResetRoutes);
-router.use('/payments', PaymentRoutes);
-router.use('/payment-methods', PaymentMethodRoutes);
-router.use('/products', ProductRoutes);
-router.use('/reviews', ReviewRoutes);
-router.use('/shippers', ShipperRoutes);
-router.use('/transactions', TransactionRoutes);
-router.use('/users', UserRoutes);
-router.use('/wallets', WalletRoutes);
-router.use('/zones', ZoneRoutes);
+// Dynamically load routes
+const loadRoutes = (baseDir: string, basePath: string = '') => {
+    const dirPath = path.join(__dirname, baseDir);
+
+    fs.readdirSync(dirPath).forEach((item) => {
+        const fullPath = path.join(dirPath, item);
+        const stat = fs.statSync(fullPath);
+
+        if (stat.isDirectory()) {
+            // Process subdirectories (actor-specific routes)
+            const actor = item; // Folder name
+            loadRoutes(path.join(baseDir, actor), `/${actor}`);
+        } else if (item.endsWith('.Routes.ts')) {
+            // Process route files
+            const route = require(fullPath).default;
+
+            if (!basePath) {
+                // Mount public routes
+                // router.use('/', route);
+                router.use(route);
+            } else {
+                // Mount actor-specific routes
+                router.use(basePath, route);
+            }
+        }
+    });
+};
+
+// Load all routes
+loadRoutes('.');
 
 export default router;
